@@ -15,6 +15,17 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import java.util.Collection;
+import java.util.Map;
+
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessagePostProcessor;
 import org.springframework.samples.petclinic.visit.VisitRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,10 +36,6 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
-
-import javax.validation.Valid;
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * @author Juergen Hoeller
@@ -44,6 +51,12 @@ class OwnerController {
 	private final OwnerRepository owners;
 
 	private VisitRepository visits;
+
+	@Autowired
+	private JmsTemplate jmsTemplate;
+
+	@Autowired
+	private Destination ownerNotificationDestination;
 
 	public OwnerController(OwnerRepository clinicService, VisitRepository visits) {
 		this.owners = clinicService;
@@ -69,6 +82,16 @@ class OwnerController {
 		}
 		else {
 			this.owners.save(owner);
+
+			//Queue a request to send an email notification to the user
+			jmsTemplate.convertAndSend(ownerNotificationDestination, owner, new MessagePostProcessor() {
+
+				@Override
+				public Message postProcessMessage(Message message) throws JMSException {
+					message.setStringProperty("notificationType", "NewOwnerSignup");
+					return message;
+				}
+			});
 			return "redirect:/owners/" + owner.getId();
 		}
 	}
