@@ -26,6 +26,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessagePostProcessor;
+import org.springframework.samples.petclinic.appointment.AppointmentRepository;
 import org.springframework.samples.petclinic.visit.VisitRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -51,6 +52,8 @@ class OwnerController {
 	private final OwnerRepository owners;
 
 	private VisitRepository visits;
+	
+	private AppointmentRepository appointments;
 
 	@Autowired
 	private JmsTemplate jmsTemplate;
@@ -58,9 +61,10 @@ class OwnerController {
 	@Autowired
 	private Destination ownerNotificationDestination;
 
-	public OwnerController(OwnerRepository clinicService, VisitRepository visits) {
+	public OwnerController(OwnerRepository clinicService, VisitRepository visits, AppointmentRepository appointments) {
 		this.owners = clinicService;
 		this.visits = visits;
+		this.appointments = appointments;
 	}
 
 	@InitBinder
@@ -160,6 +164,7 @@ class OwnerController {
 		Owner owner = this.owners.findById(ownerId);
 		for (Pet pet : owner.getPets()) {
 			pet.setVisitsInternal(visits.findByPetId(pet.getId()));
+			pet.setAppointmentsInternal(appointments.findByPetId(pet.getId()));
 		}
 		mav.addObject(owner);
 		return mav;
