@@ -132,7 +132,7 @@ public class Pet extends NamedEntity {
 
 	public void addAppointment(Appointment appointment) {
 		getAppointmentsInternal().add(appointment);
-		appointment.setPetId(this.getId());
+		appointment.setPet(this);
 	}
 
 }

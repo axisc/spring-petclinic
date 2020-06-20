@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'appointments')}">
+
+	<body>
+	
+		<h2> Appointments </h2>
+		
+		<table id="appointments" class="table table-striped">
+			<thead>
+				<tr>
+					<th> Date </th>
+					<th> Pet </th>
+					<th style="width: 200px;"> Description </th>
+					<th> Status </th>
+					<th> Confirm appointment? </th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="appointment : ${appointments}">
+					<td th:text="${appointment.date}"/>
+					<td th:text="${appointment.pet.name}"/>
+					<td th:text="${appointment.description}"/>
+					<td th:text="${appointment.status}"/>
+					<span th:unless = "${teacher.active}">
+						<td th:href="@{~/appointmentConfirm/{appointment.id}}" />
+					</span>
+				</tr>
+			</tbody>
+		</table>
+	
+	</body>

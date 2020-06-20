@@ -1,16 +1,18 @@
 package org.springframework.samples.petclinic.appointment;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
 
 import org.springframework.samples.petclinic.owner.Pet;
 import org.springframework.samples.petclinic.owner.PetRepository;
+import org.springframework.samples.petclinic.vet.Vet;
 import org.springframework.samples.petclinic.vet.VetRepository;
 import org.springframework.samples.petclinic.vet.Vets;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -59,12 +61,40 @@ public class AppointmentController {
 	@PostMapping("/owners/{ownerId}/pets/{petId}/appointmentRequest/new")
 	public String processNewAppointmentRequestForm(@Valid Appointment appointment, BindingResult result) {
 		if (result.hasErrors()) {
+			
+			if(result.hasFieldErrors("vetId")) {
+				FieldError error = result.getFieldError();
+				Vet rejectedVet = (Vet) error.getRejectedValue();
+				System.out.println("Rejected value is " + rejectedVet.getFirstName());
+			}
+			
 			return "pets/createOrUpdateAppointmentForm";
 		}
 		else {
 			this.appointments.save(appointment);
 			return "redirect:/owners/{ownerId}";
 		}
+	}
+	
+	@GetMapping("/appointmentRequests")
+	public String getAllAppointments(Map<String, Object> model) {
+		List<Appointment> allAppointments = this.appointments.findAll();
+		model.put("appointments", allAppointments);
+		return "appointments/showAll";
+	}
+	
+	@GetMapping("/appointmentConfirm/{appointmentId}")
+	public String confirmAppointment(@PathVariable("appointmentId") int appointmentId) {
+		
+		Appointment appointment = this.appointments.findById(appointmentId);
+		if (appointment != null) {
+			appointment.setConfirmed(true);
+			this.appointments.save(appointment);
+			return "redirect:/appointmentRequests";
+		}
+		
+		return "error";
+		
 	}
 
 }

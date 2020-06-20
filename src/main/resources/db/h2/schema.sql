@@ -70,7 +70,8 @@ CREATE TABLE appointments (
   pet_id	  INTEGER NOT NULL,
   vet_id	  INTEGER NOT NULL,
   appt_date	  DATE,
-  description VARCHAR(255)
+  description VARCHAR(255),
+  confirmed BOOLEAN
 );
 ALTER TABLE appointments ADD CONSTRAINT fk_appointment_pets FOREIGN KEY (pet_id) REFERENCES pets (id);
 ALTER TABLE appointments ADD CONSTRAINT fk_appointment_vets FOREIGN KEY (vet_id) REFERENCES vets (id);
