@@ -75,26 +75,4 @@ public class AppointmentController {
 			return "redirect:/owners/{ownerId}";
 		}
 	}
-	
-	@GetMapping("/appointmentRequests")
-	public String getAllAppointments(Map<String, Object> model) {
-		List<Appointment> allAppointments = this.appointments.findAll();
-		model.put("appointments", allAppointments);
-		return "appointments/showAll";
-	}
-	
-	@GetMapping("/appointmentConfirm/{appointmentId}")
-	public String confirmAppointment(@PathVariable("appointmentId") int appointmentId) {
-		
-		Appointment appointment = this.appointments.findById(appointmentId);
-		if (appointment != null) {
-			appointment.setConfirmed(true);
-			this.appointments.save(appointment);
-			return "redirect:/appointmentRequests";
-		}
-		
-		return "error";
-		
-	}
-
 }

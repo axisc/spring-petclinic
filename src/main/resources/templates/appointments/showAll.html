@@ -12,7 +12,7 @@
 					<th> Date </th>
 					<th> Pet </th>
 					<th style="width: 200px;"> Description </th>
-					<th> Status </th>
+					<th> Confirmed </th>
 					<th> Confirm appointment? </th>
 				</tr>
 			</thead>
@@ -21,10 +21,11 @@
 					<td th:text="${appointment.date}"/>
 					<td th:text="${appointment.pet.name}"/>
 					<td th:text="${appointment.description}"/>
-					<td th:text="${appointment.status}"/>
-					<span th:unless = "${teacher.active}">
-						<td th:href="@{~/appointmentConfirm/{appointment.id}}" />
-					</span>
+					<td th:text="${appointment.confirmed}"/>
+					<td>
+						<span th:if = "${appointment.confirmed}"> N/A </span>
+						<span th:unless = "${appointment.confirmed}"> <a th:href="@{~/appointmentConfirm/{id}(id=${appointment.id})}"> Confirm </a> </span>
+					</td>
 				</tr>
 			</tbody>
 		</table>
